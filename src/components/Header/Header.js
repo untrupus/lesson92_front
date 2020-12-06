@@ -42,7 +42,7 @@ const Header = () => {
                 <Toolbar>
                     <Typography variant="h6" className={classes.title}>
                         <ForumIcon/>
-                        <Link component={RouterLink} className={classes.logo} to="/">Chat for friends</Link>
+                        <Link component={RouterLink} className={classes.logo} to="/chat">Chat for friends</Link>
                     </Typography>
                     {!user ?
                         <Button color="inherit">

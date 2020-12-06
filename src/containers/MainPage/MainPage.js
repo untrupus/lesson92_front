@@ -41,6 +41,7 @@ const MainPage = () => {
     const ws = useRef(null);
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
+    const [users, setUsers] = useState([]);
     const dispatch = useDispatch();
     const user = useSelector(state => state.users.user.user);
 
@@ -49,16 +50,17 @@ const MainPage = () => {
 
         ws.current.onopen = () => {
             ws.current.send(JSON.stringify({type: "GET_ALL_MESSAGES"}));
+            ws.current.send(JSON.stringify({type: "GET_ALL_USERS"}));
         };
 
         ws.current.onmessage = e => {
             const decodedMessage = JSON.parse(e.data);
             if (decodedMessage.type === "NEW_MESSAGE") {
                 setMessages(messages => [...messages, decodedMessage]);
-            }
-            else if (decodedMessage.type === "ALL_MESSAGES") {
-                console.log(decodedMessage);
+            } else if (decodedMessage.type === "ALL_MESSAGES") {
                 setMessages(messages => [...messages, ...decodedMessage.result]);
+            } else if (decodedMessage.type === "ALL_USERS") {
+                setUsers(users => [...users, ...decodedMessage.usersList]);
             }
         };
 
@@ -94,12 +96,24 @@ const MainPage = () => {
         </div>
     );
 
+    let usersList = (
+        <div>
+            {
+                users.map((user, idx) => {
+                    return <div key={idx}>
+                        <b>{user}</b>
+                    </div>
+                })
+            }
+        </div>
+    )
+
     return (
         <div className={classes.bg}>
             <Container>
                 <div className={classes.root}>
                     <Paper elevation={3} className={classes.members}>
-
+                        {usersList}
                     </Paper>
                     <Paper elevation={3} className={classes.messages}>
                         {chat}
