@@ -4,19 +4,21 @@ import Header from "./components/Header/Header";
 import SignIn from "./containers/SignIn/SignIn";
 import SignUp from "./containers/SignUp/SignUp";
 import MainPage from "./containers/MainPage/MainPage";
+import Welcome from "./components/Welcome/Welcome";
 
 function App() {
-  return (
-      <div className="App">
-        <Header/>
-        <Switch>
-          <Route path="/" exact component={MainPage}/>
-          <Route path="/signup" exact component={SignUp}/>
-          <Route path="/signin" exact component={SignIn}/>
-          <Route render={() => <h1>404</h1>}/>
-        </Switch>
-      </div>
-  );
+    return (
+        <div className="App">
+            <Header/>
+            <Switch>
+                <Route path="/" exact component={Welcome}/>
+                <Route path="/chat" exact component={MainPage}/>
+                <Route path="/signup" exact component={SignUp}/>
+                <Route path="/signin" exact component={SignIn}/>
+                <Route render={() => <h1>404</h1>}/>
+            </Switch>
+        </div>
+    );
 }
 
 export default App;
