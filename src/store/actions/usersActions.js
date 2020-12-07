@@ -54,7 +54,6 @@ export const logoutUser = () => {
     return async (dispatch, getState) => {
         const token = getState().users.user.token;
         const headers = {"Authorization": token};
-
         await axios.delete("/users/sessions", {headers});
         dispatch({type: LOGOUT_USER});
         dispatch(push("/"));

@@ -17,6 +17,10 @@ const useStyles = makeStyles((theme) => ({
             height: theme.spacing(70),
         },
     },
+    icon: {
+        width: '20px',
+        height: '20px'
+    },
     members: {
         width: '20%',
         padding: '20px'
@@ -24,6 +28,9 @@ const useStyles = makeStyles((theme) => ({
     messages: {
         width: '70%',
         padding: '20px'
+    },
+    user: {
+        marginBottom: '10px'
     },
     form: {
         width: '100%', // Fix IE 11 issue.
@@ -47,10 +54,12 @@ const MainPage = () => {
 
     useEffect(() => {
         ws.current = new WebSocket("ws://localhost:8000/chat?token=" + user.token);
+        let refresh;
 
         ws.current.onopen = () => {
+            console.log('Connection established');
+            clearInterval(refresh);
             ws.current.send(JSON.stringify({type: "GET_ALL_MESSAGES"}));
-            ws.current.send(JSON.stringify({type: "GET_ALL_USERS"}));
         };
 
         ws.current.onmessage = e => {
@@ -60,13 +69,23 @@ const MainPage = () => {
             } else if (decodedMessage.type === "ALL_MESSAGES") {
                 setMessages(messages => [...messages, ...decodedMessage.result]);
             } else if (decodedMessage.type === "ALL_USERS") {
-                setUsers(users => [...users, ...decodedMessage.usersList]);
+                setUsers(decodedMessage.usersList);
             }
         };
 
-        ws.current.onclose = () => console.log("ws connection closed");
+        ws.current.onclose = () => {
+             refresh = setInterval(() => {
+                ws.current = new WebSocket("ws://localhost:8000/chat?token=" + user.token);
+                console.log('Connect failure');
+            }, 5000);
+            console.log("ws connection closed");
+        };
 
-        return () => ws.current.close();
+        return () => {
+            ws.current.send(JSON.stringify({type: "DISCONNECT"}));
+            ws.current.close();
+        };
+
     }, []);
 
     const inputChangeHandler = e => {
@@ -100,8 +119,12 @@ const MainPage = () => {
         <div>
             {
                 users.map((user, idx) => {
-                    return <div key={idx}>
-                        <b>{user}</b>
+                    return <div key={idx} className={classes.user}>
+                        <img className={classes.icon}
+                             src='https://installprogram.ru/wp-content/uploads/2018/04/ICQLogo.png'
+                             alt='icq'
+                        />
+                        <b>  {user}</b>
                     </div>
                 })
             }
@@ -133,6 +156,7 @@ const MainPage = () => {
                         onChange={inputChangeHandler}
                         autoComplete="message"
                         autoFocus
+                        required={true}
                     />
                     <Button
                         type="submit"
