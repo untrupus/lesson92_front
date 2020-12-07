@@ -1,5 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {useDispatch, useSelector} from "react-redux";
+import {getMessages, getUsers, postMessage} from "../../store/actions/chatActions";
 import Container from "@material-ui/core/Container";
 import {makeStyles} from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -47,8 +48,10 @@ const MainPage = () => {
     const classes = useStyles();
     const ws = useRef(null);
     const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState([]);
-    const [users, setUsers] = useState([]);
+    // const [messages, setMessages] = useState([]);
+    // const [users, setUsers] = useState([]);
+    const users = useSelector(state => state.chat.users);
+    const messages = useSelector(state => state.chat.messages);
     const dispatch = useDispatch();
     const user = useSelector(state => state.users.user.user);
 
@@ -65,11 +68,14 @@ const MainPage = () => {
         ws.current.onmessage = e => {
             const decodedMessage = JSON.parse(e.data);
             if (decodedMessage.type === "NEW_MESSAGE") {
-                setMessages(messages => [...messages, decodedMessage]);
+                // setMessages(messages => [...messages, decodedMessage]);
+                dispatch(postMessage(decodedMessage));
             } else if (decodedMessage.type === "ALL_MESSAGES") {
-                setMessages(messages => [...messages, ...decodedMessage.result]);
+                // setMessages(messages => [...messages, ...decodedMessage.result]);
+                dispatch(getMessages(decodedMessage.result));
             } else if (decodedMessage.type === "ALL_USERS") {
-                setUsers(decodedMessage.usersList);
+                // setUsers(decodedMessage.usersList);
+                dispatch(getUsers(decodedMessage.usersList));
             }
         };
 
@@ -86,7 +92,7 @@ const MainPage = () => {
             ws.current.close();
         };
 
-    }, []);
+    }, [user.token, dispatch]);
 
     const inputChangeHandler = e => {
         setMessage(e.target.value);
@@ -100,7 +106,6 @@ const MainPage = () => {
         }));
         setMessage('');
     };
-
 
     let chat = (
         <div>

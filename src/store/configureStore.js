@@ -1,6 +1,7 @@
 import {applyMiddleware, combineReducers, compose, createStore} from "redux";
 import {createBrowserHistory} from "history";
 import usersReducer from "./reducers/usersReducer";
+import chatReducer from "./reducers/chatReducer";
 import {connectRouter, routerMiddleware} from "connected-react-router";
 import thunkMiddleware from "redux-thunk";
 import {loadFromLocalStorage, saveToLocalStorage} from "./localStorage";
@@ -11,6 +12,7 @@ export const history = createBrowserHistory();
 
 const rootReducer = combineReducers({
     users: usersReducer,
+    chat: chatReducer,
     router: connectRouter(history)
 });
 
